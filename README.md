@@ -1,8 +1,3 @@
-Got it 👍 — here is a **clean single README.md file** based exactly on your project structure. Just copy-paste it into your root `README.md`.
-
----
-
-```markdown
 # 🎓 Student Course Registration Portal
 
 A full-stack **MERN (MongoDB, Express, React, Node.js)** application where:
