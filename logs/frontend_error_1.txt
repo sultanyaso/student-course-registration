@@ -1,0 +1,33 @@
+npm run dev
+
+> frontend@0.0.0 dev
+> vite
+
+
+  VITE v7.3.1  ready in 384 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+(!) Failed to run dependency scan. Skipping dependency pre-bundling. Error:   Failed to scan for dependencies from entries:
+  /home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/index.html
+
+  ✘ [ERROR] Expected ")" but found "const"
+
+    src/pages/StudentDashboard.jsx:326:2:
+      326 │   const ScheduleView = () => {
+          │   ~~~~~
+          ╵   )
+
+
+    at failureErrorWithLog (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:1467:15)
+    at /home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:926:25
+    at runOnEndCallbacks (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:1307:45)
+    at buildResponseToResult (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:924:7)
+    at /home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:936:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:935:54)
+    at handleRequest (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:628:17)
+    at handleIncomingPacket (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:653:7)
+    at Socket.readFromStdout (/home/sanaanazfar-22i-2594/UNI/Semester8/Web-Lab/Weblab_project/student-course-registration/frontend/node_modules/esbuild/lib/main.js:581:7)
+
