@@ -70,10 +70,22 @@ router.get("/fee", authMiddleware, async (req, res) => {
 // --- Register for a course ---
 router.post("/register/:courseId", authMiddleware, async (req, res) => {
   try {
+    const course = await Course.findById(req.params.courseId);
+    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    // Check capacity
+    if (course.enrolledCount >= course.capacity) {
+      return res.status(400).json({ message: "Course is full" });
+    }
+
     const student = await User.findById(req.user.id);
     if (!student.registeredCourses.includes(req.params.courseId)) {
       student.registeredCourses.push(req.params.courseId);
       await student.save();
+
+      // Increment enrolledCount
+      course.enrolledCount += 1;
+      await course.save();
     }
     const updatedStudent = await student.populate("registeredCourses");
     res.json({ message: "Course registered", registeredCourses: updatedStudent.registeredCourses });
@@ -86,10 +98,34 @@ router.post("/register/:courseId", authMiddleware, async (req, res) => {
 router.post("/unregister/:courseId", authMiddleware, async (req, res) => {
   try {
     const student = await User.findById(req.user.id);
-    student.registeredCourses = student.registeredCourses.filter(c => c.toString() !== req.params.courseId);
-    await student.save();
+    if (student.registeredCourses.includes(req.params.courseId)) {
+      student.registeredCourses = student.registeredCourses.filter(c => c.toString() !== req.params.courseId);
+      await student.save();
+
+      // Decrement enrolledCount
+      const course = await Course.findById(req.params.courseId);
+      if (course && course.enrolledCount > 0) {
+        course.enrolledCount -= 1;
+        await course.save();
+      }
+    }
     const updatedStudent = await student.populate("registeredCourses");
     res.json({ message: "Course unregistered", registeredCourses: updatedStudent.registeredCourses });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- Update student profile ---
+router.put("/profile", authMiddleware, async (req, res) => {
+  try {
+    const { name, rollNo, campus, program, department } = req.body;
+    const student = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, rollNo, campus, program, department },
+      { new: true }
+    ).select("-password");
+    res.json({ student });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

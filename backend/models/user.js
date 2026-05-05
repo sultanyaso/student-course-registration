@@ -7,17 +7,22 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["student", "teacher"],
+      enum: ["student", "teacher", "admin"],
       default: "student",
     },
     isApproved: {
       type: Boolean,
-      default: false, // new users start as unapproved
+      default: false,
     },
+    rollNo: { type: String },
+    campus: { type: String },
+    program: { type: String },
+    department: { type: String },
+    status: { type: String, default: "Active" },
     registeredCourses: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Course", // links to Course model
+        ref: "Course",
       },
     ],
   },

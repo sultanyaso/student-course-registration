@@ -24,6 +24,17 @@ app.use("/api/admin", adminRoutes);
 const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
 
+const quizRoutes = require("./routes/quizRoutes");
+app.use("/api/quizzes", quizRoutes);
+
+const assignmentRoutes = require("./routes/assignmentRoutes");
+app.use("/api/assignments", assignmentRoutes);
+
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/chat", chatRoutes);
+
+// Static folder for file uploads
+app.use("/uploads", express.static("uploads"));
 
 const courseRoutes = require("./routes/courseRoutes");
 app.use("/api/courses", courseRoutes);

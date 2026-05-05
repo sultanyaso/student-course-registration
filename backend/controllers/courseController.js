@@ -1,9 +1,30 @@
 const Course = require("../models/course");
 
-// Get all courses
+// Get all courses (with optional search/filter)
 exports.getCourses = async (req, res) => {
   try {
-    const courses = await Course.find({});
+    const { search, department, minCredits, maxCredits } = req.query;
+    let query = {};
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { instructor: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (department) {
+      query.department = department;
+    }
+
+    if (minCredits || maxCredits) {
+      query.creditHours = {};
+      if (minCredits) query.creditHours.$gte = Number(minCredits);
+      if (maxCredits) query.creditHours.$lte = Number(maxCredits);
+    }
+
+    const courses = await Course.find(query);
     res.json({ courses });
   } catch (err) {
     console.error(err);
