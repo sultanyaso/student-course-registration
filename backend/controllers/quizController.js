@@ -1,6 +1,32 @@
 const Quiz = require("../models/quiz");
 const QuizAttempt = require("../models/quizAttempt");
 const User = require("../models/user");
+const axios = require("axios");
+
+// Fetch questions from OpenTDB
+exports.fetchOpenTDBQuestions = async (req, res) => {
+  try {
+    const { amount = 10, category = 18, difficulty = "medium" } = req.query;
+    
+    const response = await axios.get(`https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${difficulty}&type=multiple`);
+    
+    if (response.data.response_code !== 0) {
+      return res.status(400).json({ message: "Failed to fetch questions from OpenTDB" });
+    }
+
+    // Transform to our schema
+    const questions = response.data.results.map(q => ({
+      question: q.question,
+      options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+      correctAnswer: q.correct_answer,
+      explanation: `Category: ${q.category}`
+    }));
+
+    res.json({ questions });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // Get all quizzes for a student (based on registered courses)
 exports.getAvailableQuizzes = async (req, res) => {

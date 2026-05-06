@@ -4,16 +4,18 @@ const {
   getAvailableQuizzes, 
   getQuizDetails, 
   submitQuiz, 
-  createQuiz 
+  createQuiz,
+  fetchOpenTDBQuestions
 } = require("../controllers/quizController");
-const { authMiddleware } = require("../middleware/authMiddleware");
+const { authMiddleware, staffMiddleware } = require("../middleware/authMiddleware");
 
 // Student Routes
 router.get("/available", authMiddleware, getAvailableQuizzes);
 router.get("/:id", authMiddleware, getQuizDetails);
 router.post("/submit", authMiddleware, submitQuiz);
 
-// Admin/Teacher Routes (Sanaan can use these)
-router.post("/create", authMiddleware, createQuiz);
+// Admin/Teacher Routes
+router.get("/opentdb/fetch", authMiddleware, staffMiddleware, fetchOpenTDBQuestions);
+router.post("/create", authMiddleware, staffMiddleware, createQuiz);
 
 module.exports = router;

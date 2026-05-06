@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const User = require("./models/user");
 const authRoutes = require("./routes/authRoutes"); // no () here
 const adminRoutes = require("./routes/adminRoutes");
 
@@ -17,12 +18,14 @@ app.use(express.json());
 connectDB();
 
 // Routes
-app.use("/api/auth", authRoutes); // correct
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 
 const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
+
+const teacherRoutes = require("./routes/teacherRoutes");
+app.use("/api/teacher", teacherRoutes);
 
 const quizRoutes = require("./routes/quizRoutes");
 app.use("/api/quizzes", quizRoutes);

@@ -18,10 +18,26 @@ exports.authMiddleware = async (req, res, next) => {
   }
 };
 
-// Admin/teacher middleware
-exports.adminMiddleware = (req, res, next) => {
+// Admin/teacher middleware (Combined staff access)
+exports.staffMiddleware = (req, res, next) => {
   if (req.user.role !== "admin" && req.user.role !== "teacher") {
     return res.status(403).json({ message: "Access denied. Admins/Teachers only." });
+  }
+  next();
+};
+
+// Strict Teacher middleware
+exports.teacherMiddleware = (req, res, next) => {
+  if (req.user.role !== "teacher") {
+    return res.status(403).json({ message: "Access denied. Teachers only." });
+  }
+  next();
+};
+
+// Strict Admin middleware
+exports.adminMiddleware = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied. Admins only." });
   }
   next();
 };

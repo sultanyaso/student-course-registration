@@ -1,6 +1,32 @@
 const User = require("../models/user");
 const Course = require("../models/course");
 
+// --- Analytics ---
+exports.getSystemStats = async (req, res) => {
+  try {
+    const studentCount = await User.countDocuments({ role: "student" });
+    const teacherCount = await User.countDocuments({ role: "teacher" });
+    const courseCount = await Course.countDocuments();
+    
+    // Calculate total enrollment and fees
+    const allCourses = await Course.find();
+    const totalEnrollments = allCourses.reduce((sum, c) => sum + c.enrolledCount, 0);
+    const totalPotentialRevenue = allCourses.reduce((sum, c) => sum + (c.enrolledCount * c.creditHours * c.feePerCredit), 0);
+
+    res.json({
+      stats: {
+        students: studentCount,
+        teachers: teacherCount,
+        courses: courseCount,
+        enrollments: totalEnrollments,
+        revenue: totalPotentialRevenue
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // --- Admin profile ---
 exports.getAdminInfo = async (req, res) => {
   try {
@@ -47,6 +73,16 @@ exports.approveStudent = async (req, res) => {
   }
 };
 
+// --- Teachers ---
+exports.getTeachers = async (req, res) => {
+  try {
+    const teachers = await User.find({ role: "teacher" }).select("name email");
+    res.json({ teachers });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // --- Courses ---
 exports.getCourses = async (req, res) => {
   try {
@@ -59,11 +95,22 @@ exports.getCourses = async (req, res) => {
 
 exports.addCourse = async (req, res) => {
   try {
-    const { name, instructor } = req.body;
-    if (!name || !instructor) {
-      return res.status(400).json({ message: "Name and instructor required" });
+    const { name, instructor, creditHours, feePerCredit, department, capacity, schedule, description } = req.body;
+    
+    if (!name || !instructor || !creditHours || !feePerCredit) {
+      return res.status(400).json({ message: "All required fields must be filled" });
     }
-    const course = await Course.create({ name, instructor });
+
+    const course = await Course.create({ 
+      name, 
+      instructor, 
+      creditHours, 
+      feePerCredit, 
+      department, 
+      capacity, 
+      schedule,
+      description
+    });
     res.status(201).json({ message: "Course added", course });
   } catch (err) {
     res.status(500).json({ message: err.message });

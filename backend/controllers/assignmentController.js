@@ -67,6 +67,57 @@ exports.submitAssignment = async (req, res) => {
   }
 };
 
+// Get all assignments created for courses assigned to this teacher
+exports.getTeacherAssignments = async (req, res) => {
+  try {
+    const teacherCourses = await Course.find({ 
+      $or: [
+        { teacherId: req.user.id },
+        { instructor: req.user.name }
+      ]
+    }).select("_id");
+    
+    const courseIds = teacherCourses.map(c => c._id);
+    const assignments = await Assignment.find({ courseId: { $in: courseIds } })
+      .populate("courseId", "name");
+    
+    res.json({ assignments });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all submissions for a specific assignment
+exports.getAssignmentSubmissions = async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+    const submissions = await Submission.find({ assignmentId })
+      .populate("studentId", "name email rollNo");
+    res.json({ submissions });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Grade a submission
+exports.gradeSubmission = async (req, res) => {
+  try {
+    const { submissionId } = req.params;
+    const { grade, feedback } = req.body;
+
+    const submission = await Submission.findByIdAndUpdate(
+      submissionId,
+      { grade, feedback, status: "graded" },
+      { new: true }
+    );
+
+    if (!submission) return res.status(404).json({ message: "Submission not found" });
+    res.json({ message: "Graded successfully", submission });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Create Assignment (Admin/Teacher)
 exports.createAssignment = async (req, res) => {
   try {
