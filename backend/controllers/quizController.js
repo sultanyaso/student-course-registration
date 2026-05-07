@@ -1,7 +1,22 @@
 const Quiz = require("../models/quiz");
 const QuizAttempt = require("../models/quizAttempt");
 const User = require("../models/user");
+const Course = require("../models/course");
 const axios = require("axios");
+
+// Helper to decode HTML entities
+const decodeHTML = (str) => {
+  return str.replace(/&quot;/g, '"')
+            .replace(/&#039;/g, "'")
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&deg;/g, '°')
+            .replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"')
+            .replace(/&lsquo;/g, "'")
+            .replace(/&rsquo;/g, "'");
+};
 
 // Fetch questions from OpenTDB
 exports.fetchOpenTDBQuestions = async (req, res) => {
@@ -14,15 +29,35 @@ exports.fetchOpenTDBQuestions = async (req, res) => {
       return res.status(400).json({ message: "Failed to fetch questions from OpenTDB" });
     }
 
-    // Transform to our schema
+    // Transform to our schema and decode HTML entities
     const questions = response.data.results.map(q => ({
-      question: q.question,
-      options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
-      correctAnswer: q.correct_answer,
+      question: decodeHTML(q.question),
+      options: [...q.incorrect_answers, q.correct_answer].map(opt => decodeHTML(opt)).sort(() => Math.random() - 0.5),
+      correctAnswer: decodeHTML(q.correct_answer),
       explanation: `Category: ${q.category}`
     }));
 
     res.json({ questions });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Get all quizzes created for courses assigned to this teacher
+exports.getTeacherQuizzes = async (req, res) => {
+  try {
+    const teacherCourses = await Course.find({ 
+      $or: [
+        { teacherId: req.user.id },
+        { instructor: req.user.name }
+      ]
+    }).select("_id");
+    
+    const courseIds = teacherCourses.map(c => c._id);
+    const quizzes = await Quiz.find({ courseId: { $in: courseIds } })
+      .populate("courseId", "name");
+    
+    res.json({ quizzes });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -123,6 +158,32 @@ exports.createQuiz = async (req, res) => {
     const quiz = new Quiz(req.body);
     await quiz.save();
     res.status(201).json({ message: "Quiz created", quiz });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Update Quiz
+exports.updateQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+    res.json({ message: "Quiz updated", quiz });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Delete Quiz
+exports.deleteQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findByIdAndDelete(req.params.id);
+    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+
+    // Delete any attempts related to this quiz
+    await QuizAttempt.deleteMany({ quizId: req.params.id });
+
+    res.json({ message: "Quiz deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

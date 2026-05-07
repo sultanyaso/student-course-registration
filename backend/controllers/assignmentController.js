@@ -1,6 +1,7 @@
 const Assignment = require("../models/assignment");
 const Submission = require("../models/submission");
 const User = require("../models/user");
+const Course = require("../models/course");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -124,6 +125,33 @@ exports.createAssignment = async (req, res) => {
     const assignment = new Assignment(req.body);
     await assignment.save();
     res.status(201).json({ message: "Assignment created", assignment });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Update Assignment
+exports.updateAssignment = async (req, res) => {
+  try {
+    const assignment = await Assignment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!assignment) return res.status(404).json({ message: "Assignment not found" });
+    res.json({ message: "Assignment updated", assignment });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Delete Assignment
+exports.deleteAssignment = async (req, res) => {
+  try {
+    // Delete the assignment
+    const assignment = await Assignment.findByIdAndDelete(req.params.id);
+    if (!assignment) return res.status(404).json({ message: "Assignment not found" });
+
+    // Also delete any submissions related to this assignment
+    await Submission.deleteMany({ assignmentId: req.params.id });
+
+    res.json({ message: "Assignment deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

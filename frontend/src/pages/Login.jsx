@@ -32,6 +32,8 @@ const Login = () => {
       if (res.data.user.role === "student") {
         navigate("/student");
       } else if (res.data.user.role === "teacher") {
+        navigate("/teacher");
+      } else if (res.data.user.role === "admin") {
         navigate("/admin");
       }
     } catch (err) {
@@ -68,7 +70,7 @@ const Login = () => {
           flexDirection: "column",
         }}
       >
-        <h2 style={{ textAlign: "center", marginBottom: "25px" }}>Login</h2>
+        <h2 style={{ textAlign: "center", marginBottom: "25px",color: "black" }}>Login</h2>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
@@ -110,7 +112,7 @@ const Login = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p style={{ textAlign: "center", marginTop: "18px", fontSize: "14px" }}>
+        <p style={{ textAlign: "center", marginTop: "18px", fontSize: "14px" ,color: "black"}}>
           Don't have an account?{" "}
           <span
             onClick={() => navigate("/register")}

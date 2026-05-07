@@ -1,0 +1,96 @@
+Based on the Open Trivia DB API documentation in your screenshot, here's everything you need:
+
+---
+
+## Getting the API URL
+
+**Base URL:**
+```
+https://opentdb.com/api.php?amount=10
+```
+Replace `10` with however many questions you want (max 50).
+
+---
+
+## Session Tokens (Optional but Recommended)
+
+Session tokens ensure you never get the same question twice.
+
+**Retrieve a token:**
+```
+https://opentdb.com/api_token.php?command=request
+```
+
+**Use the token in your API call:**
+```
+https://opentdb.com/api.php?amount=10&token=YOURTOKENHERE
+```
+
+**Reset the token** (when exhausted):
+```
+https://opentdb.com/api_token.php?command=reset&token=YOURTOKENHERE
+```
+
+> ⚠️ Tokens are deleted after **6 hours of inactivity**.
+
+---
+
+## Response Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | No Results |
+| 2 | Invalid Parameter |
+| 3 | Token Not Found |
+| 4 | Token Empty (reset required) |
+| 5 | Rate Limit (wait 5 seconds) |
+
+---
+
+## Query Parameters
+
+| Parameter | Options |
+|-----------|---------|
+| `amount` | Number of questions (max 50) |
+| `category` | Category ID (omit for any) |
+| `difficulty` | `easy`, `medium`, `hard` |
+| `type` | `multiple`, `boolean` |
+| `encode` | `urlLegacy`, `url3986`, `base64` |
+
+**Example full URL:**
+```
+https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple
+```
+
+---
+
+## Helper Endpoints
+
+```
+# All categories + IDs
+https://opentdb.com/api_category.php
+
+# Question count for a specific category
+https://opentdb.com/api_count.php?category=CATEGORY_ID_HERE
+
+# Total question count (all states)
+https://opentdb.com/api_count_global.php
+```
+
+---
+
+## Encoding
+
+By default, responses use **HTML encoding**. To change it, add `&encode=` to your URL:
+
+- `url3986` — URL encoding (RFC 3986)
+- `urlLegacy` — Legacy URL encoding
+- `base64` — Base64 encoding
+
+---
+
+## Limitations
+- Only **1 category** per API call
+- Max **50 questions** per call
+- No API key required — completely free

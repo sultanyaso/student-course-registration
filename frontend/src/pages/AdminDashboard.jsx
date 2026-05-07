@@ -1,6 +1,7 @@
 // src/pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -55,9 +56,21 @@ const AdminDashboard = () => {
     }
   };
 
+  // --- Fetch Stats ---
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/admin/stats", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStats(res.data.stats);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchAdminInfo(), fetchStudents(), fetchCourses()]).finally(() => setLoading(false));
+    Promise.all([fetchAdminInfo(), fetchStudents(), fetchCourses(), fetchStats()]).finally(() => setLoading(false));
   }, []);
 
   // --- Approve / Reject Student ---
@@ -68,10 +81,11 @@ const AdminDashboard = () => {
         { approve },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      toast.success("Student status updated!");
       fetchStudents();
     } catch (err) {
       console.error(err);
-      setError("Failed to update student status.");
+      toast.error("Failed to update student status.");
     }
   };
 
@@ -81,7 +95,7 @@ const AdminDashboard = () => {
     setError("");
 
     if (!newCourse.name || !newCourse.instructor || newCourse.creditHours === "" || newCourse.feePerCredit === "") {
-      return setError("All fields are required");
+      return toast.error("All fields are required");
     }
 
     try {
@@ -96,11 +110,12 @@ const AdminDashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
+      toast.success("Course added!");
       setNewCourse({ name: "", instructor: "", creditHours: "", feePerCredit: "" });
       fetchCourses();
     } catch (err) {
       console.error(err);
-      setError("Failed to add course.");
+      toast.error("Failed to add course.");
     } finally {
       setLoadingCourses(false);
     }
@@ -112,7 +127,7 @@ const AdminDashboard = () => {
     setError("");
 
     if (!editingCourse.name || !editingCourse.instructor || editingCourse.creditHours === "" || editingCourse.feePerCredit === "") {
-      return setError("All fields are required");
+      return toast.error("All fields are required");
     }
 
     try {
@@ -127,28 +142,30 @@ const AdminDashboard = () => {
         },
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
       );
+      toast.success("Course updated!");
       setEditingCourse(null);
       fetchCourses();
     } catch (err) {
       console.error(err);
-      setError("Failed to update course.");
+      toast.error("Failed to update course.");
     } finally {
       setLoadingCourses(false);
     }
   };
 
   const handleDeleteCourse = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this course?")) return;
+    if (!window.confirm("Are you sure?")) return;
 
     try {
       setLoadingCourses(true);
       await axios.delete(`http://localhost:5000/api/admin/courses/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      toast.success("Course deleted!");
       fetchCourses();
     } catch (err) {
       console.error(err);
-      setError("Failed to delete course.");
+      toast.error("Failed to delete course.");
     } finally {
       setLoadingCourses(false);
     }
@@ -303,10 +320,53 @@ const AdminDashboard = () => {
 
   const ReportsView = () => (
     <div style={cardStyle}>
-      <h2 style={sectionHeaderStyle}>Reports</h2>
-      <p style={{ color: "#64748b", marginTop: "10px" }}>Reports and analytics will be added here soon.</p>
+      <h2 style={sectionHeaderStyle}>System Analytics</h2>
+      {stats ? (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "20px", marginTop: "20px" }}>
+          <div style={statCardStyle("#2563eb")}>
+            <span style={{ fontSize: "14px" }}>Total Students</span>
+            <h1 style={{ margin: "10px 0" }}>{stats.students}</h1>
+          </div>
+          <div style={statCardStyle("#10b981")}>
+            <span style={{ fontSize: "14px" }}>Total Teachers</span>
+            <h1 style={{ margin: "10px 0" }}>{stats.teachers}</h1>
+          </div>
+          <div style={statCardStyle("#f59e0b")}>
+            <span style={{ fontSize: "14px" }}>Active Courses</span>
+            <h1 style={{ margin: "10px 0" }}>{stats.courses}</h1>
+          </div>
+          <div style={statCardStyle("#ef4444")}>
+            <span style={{ fontSize: "14px" }}>Total Enrollments</span>
+            <h1 style={{ margin: "10px 0" }}>{stats.enrollments}</h1>
+          </div>
+          <div style={{ ...statCardStyle("#6366f1"), gridColumn: "span 1" }}>
+            <span style={{ fontSize: "14px" }}>Projected Revenue</span>
+            <h2 style={{ margin: "10px 0" }}>${(stats.revenue || 0).toLocaleString()}</h2>
+          </div>
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", padding: "50px", color: "#64748b" }}>
+          <p>No analytics data available yet.</p>
+        </div>
+      )}
+
+      <div style={{ marginTop: "40px" }}>
+        <h3>Enrollment Density</h3>
+        <p style={{ fontSize: "14px", color: "#64748b" }}>Course-wise enrollment visualization coming soon.</p>
+      </div>
     </div>
   );
+
+  const statCardStyle = (color) => ({
+    padding: "20px",
+    borderRadius: "12px",
+    background: color,
+    color: "white",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)"
+  });
 
   if (loading) return <p style={{ textAlign: "center" }}>Loading dashboard...</p>;
 
@@ -346,7 +406,7 @@ const cardStyle = { backgroundColor: "white", padding: "30px", borderRadius: "16
 const sectionHeaderStyle = { color: "#1e293b", marginBottom: "20px", fontSize: "20px" };
 const tableStyle = { width: "100%", borderCollapse: "collapse" };
 const tableHeaderStyle = { background: "#2563eb", color: "#fff", textAlign: "center" };
-const trStyle = { textAlign: "center", borderBottom: "1px solid #e5e7eb" };
+const trStyle = { textAlign: "center", borderBottom: "1px solid #e5e7eb", color :"black" };
 const tdStyle = { padding: "10px" };
 const approveButtonStyle = { marginRight: "5px", padding: "6px 12px", background: "#10b981", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" };
 const rejectButtonStyle = { padding: "6px 12px", background: "#ef4444", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer" };

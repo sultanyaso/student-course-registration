@@ -1,6 +1,7 @@
 // src/pages/StudentDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const StudentDashboard = () => {
   // --- States ---
@@ -290,7 +291,7 @@ const StudentDashboard = () => {
           </div>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <button disabled={currentIndex === 0} onClick={() => setCurrentIndex(currentIndex - 1)} style={regButtonStyle}>Prev</button>
-            {currentIndex === quiz.questions.length - 1 ? 
+            {currentIndex === quiz.questions.length - 1 ?
               <button onClick={handleSubmit} disabled={submitting} style={{ ...regButtonStyle, background: "green" }}>Finish</button> :
               <button onClick={() => setCurrentIndex(currentIndex + 1)} style={regButtonStyle}>Next</button>
             }
@@ -305,7 +306,7 @@ const StudentDashboard = () => {
     const [uploading, setUploading] = useState("");
 
     const handleUpload = async (asgnId) => {
-      if (!file) return alert("Select file");
+      if (!file) return toast.error("Select a file first");
       setUploading(asgnId);
       const fd = new FormData();
       fd.append("file", file);
@@ -314,9 +315,9 @@ const StudentDashboard = () => {
         await axios.post("http://localhost:5000/api/assignments/submit", fd, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }
         });
-        alert("Submitted!");
+        toast.success("Assignment submitted!");
         fetchAssignments();
-      } catch (err) { alert("Upload failed."); } finally { setUploading(""); }
+      } catch (err) { toast.error("Upload failed."); } finally { setUploading(""); }
     };
 
     return (
@@ -324,9 +325,11 @@ const StudentDashboard = () => {
         <h2 style={sectionHeaderStyle}>Assignments</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "20px" }}>
           {assignments.map(a => (
-            <div key={a._id} style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "10px" }}>
-              <h4>{a.title}</h4>
-              <p style={{ fontSize: "13px" }}>{a.courseId?.name}</p>
+            <div key={a._id} style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "10px", backgroundColor: "white" }}>
+              <h4 style={{ color: "black", margin: "0 0 10px 0" }}>{a.title}</h4>
+              <p style={{ fontSize: "13px", color: "#475569", marginBottom: "10px" }}>{a.description}</p>
+              <p style={{ fontSize: "13px", color: "#64748b" }}><strong>Course:</strong> {a.courseId?.name}</p>
+
               <p style={{ fontSize: "12px", color: "#666" }}>Deadline: {new Date(a.deadline).toLocaleDateString()}</p>
               <p>Status: <strong style={{ color: a.status === "pending" ? "orange" : "green" }}>{a.status.toUpperCase()}</strong></p>
               {a.status === "pending" && (
@@ -445,7 +448,7 @@ const StudentDashboard = () => {
     <div style={{ display: "flex", minHeight: "100vh", width: "100vw", backgroundColor: "#f1f5f9" }}>
       {activeQuiz && <QuizTakingInterface quiz={activeQuiz} onComplete={handleQuizComplete} />}
       <ChatWidget />
-      
+
       {/* Sidebar */}
       <div style={sidebarStyle}>
         <div>

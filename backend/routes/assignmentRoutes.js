@@ -7,7 +7,9 @@ const {
   createAssignment,
   getTeacherAssignments,
   getAssignmentSubmissions,
-  gradeSubmission
+  gradeSubmission,
+  updateAssignment,
+  deleteAssignment
 } = require("../controllers/assignmentController");
 const { authMiddleware, staffMiddleware } = require("../middleware/authMiddleware");
 
@@ -20,5 +22,7 @@ router.get("/teacher", authMiddleware, staffMiddleware, getTeacherAssignments);
 router.get("/submissions/:assignmentId", authMiddleware, staffMiddleware, getAssignmentSubmissions);
 router.patch("/submissions/:submissionId/grade", authMiddleware, staffMiddleware, gradeSubmission);
 router.post("/create", authMiddleware, staffMiddleware, createAssignment);
+router.put("/:id", authMiddleware, staffMiddleware, updateAssignment);
+router.delete("/:id", authMiddleware, staffMiddleware, deleteAssignment);
 
 module.exports = router;

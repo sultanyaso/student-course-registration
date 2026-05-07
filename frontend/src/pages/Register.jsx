@@ -27,7 +27,7 @@ const Register = () => {
 
     try {
       const res = await axios.post("http://localhost:5000/api/auth/register", form);
-      
+
       // Save token and role in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
@@ -36,7 +36,7 @@ const Register = () => {
       if (res.data.user.role === "student") {
         navigate("/student");
       } else if (res.data.user.role === "teacher") {
-        navigate("/teacher-dashboard");
+        navigate("/teacher");
       }
     } catch (err) {
       console.error(err);
@@ -72,7 +72,7 @@ const Register = () => {
           flexDirection: "column",
         }}
       >
-        <h2 style={{ textAlign: "center", marginBottom: "25px" }}>Create Account</h2>
+        <h2 style={{ textAlign: "center", marginBottom: "25px" ,color: "black"}}>Create Account</h2>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
@@ -134,7 +134,7 @@ const Register = () => {
           {loading ? "Registering..." : "Register"}
         </button>
 
-        <p style={{ textAlign: "center", marginTop: "18px", fontSize: "14px" }}>
+        <p style={{ textAlign: "center", marginTop: "18px", fontSize: "14px", color: "black" }}>
           Already have an account?{" "}
           <span
             onClick={() => navigate("/")}

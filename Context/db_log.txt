@@ -1,0 +1,122 @@
+sanaan> use WebDb
+switched to db WebDb
+WebDb> show collections
+assignments
+courses
+init
+quizattempts
+quizzes
+submissions
+users
+WebDb> db.assignment.find()
+
+WebDb> db.assignments.find()
+[
+  {
+    _id: ObjectId('69fba9a66216ea8ef567bece'),
+    courseId: ObjectId('69fba89b6216ea8ef567bebb'),
+    title: 'Assignment_1',
+    description: 'Create A simple hello world program in c++',
+    deadline: ISODate('2026-05-15T00:00:00.000Z'),
+    maxScore: 100,
+    createdAt: ISODate('2026-05-06T20:50:46.572Z'),
+    updatedAt: ISODate('2026-05-06T20:50:46.572Z'),
+    __v: 0
+  },
+  {
+    _id: ObjectId('69fbb2737725a8ae49fc5894'),
+    courseId: ObjectId('69fba89b6216ea8ef567bebb'),
+    title: 'Assignment_2',
+    description: 'Create a program for printing fibonachi sequence ',
+    deadline: ISODate('2026-05-30T00:00:00.000Z'),
+    maxScore: 100,
+    createdAt: ISODate('2026-05-06T21:28:19.902Z'),
+    updatedAt: ISODate('2026-05-06T21:28:19.902Z'),
+    __v: 0
+  },
+  {
+    _id: ObjectId('69fbb5ba6bbe87b0a47772bd'),
+    courseId: ObjectId('69fba89b6216ea8ef567bebb'),
+    title: 'Assignment_3',
+    description: 'Create a program for printing fibonachi sequence ',
+    deadline: ISODate('2026-06-06T00:00:00.000Z'),
+    maxScore: 100,
+    createdAt: ISODate('2026-05-06T21:42:18.082Z'),
+    updatedAt: ISODate('2026-05-06T21:42:18.082Z'),
+    __v: 0
+  }
+]
+WebDb> db.courses.find()
+[
+  {
+    _id: ObjectId('69fba89b6216ea8ef567bebb'),
+    name: 'PF',
+    instructor: 'SAK_T',
+    creditHours: 3,
+    feePerCredit: 15000,
+    capacity: 50,
+    enrolledCount: 1,
+    createdAt: ISODate('2026-05-06T20:46:19.866Z'),
+    updatedAt: ISODate('2026-05-06T20:51:27.928Z'),
+    __v: 0
+  }
+]
+WebDb> db.users.find()
+[
+  {
+    _id: ObjectId('69fa6206ddebfc55b2101273'),
+    name: 'Sanaan Azfar',
+    email: 'sanaanazfar742004@gmail.com',
+    password: '$2b$10$DvlNqnUmSkBIgeKTDR6TrO1PSQiMVgwnlo8x01jqE5EOILfd5/spm',
+    role: 'student',
+    isApproved: true,
+    status: 'Active',
+    registeredCourses: [],
+    createdAt: ISODate('2026-05-05T21:32:54.304Z'),
+    updatedAt: ISODate('2026-05-06T14:44:11.702Z'),
+    __v: 0,
+    campus: 'Islamabad',
+    program: 'Bs Software Engineering',
+    rollNo: '22I-2594'
+  },
+  {
+    _id: ObjectId('69fb45d94d8e01e6001d7854'),
+    name: 'SAK',
+    email: 'SAK@gmail.com',
+    password: '$2b$10$VIGgK2DOP8toHBscdtarZOQ8pPkGvc.2JLB8WmdDHY1tZIVPC3lpy',
+    role: 'student',
+    isApproved: true,
+    status: 'Active',
+    registeredCourses: [ ObjectId('69fba89b6216ea8ef567bebb') ],
+    createdAt: ISODate('2026-05-06T13:44:57.030Z'),
+    updatedAt: ISODate('2026-05-06T20:51:27.919Z'),
+    __v: 1
+  },
+  {
+    _id: ObjectId('69fb462b4d8e01e6001d7875'),
+    name: 'SAK_T',
+    email: 'SAK_T@gmail.com',
+    password: '$2b$10$8MNq0PymXRKBdUCE5cvzSesfatzDGcZe..d6Goxw712UfXGSLA6kG',
+    role: 'teacher',
+    isApproved: false,
+    status: 'Active',
+    registeredCourses: [],
+    createdAt: ISODate('2026-05-06T13:46:19.209Z'),
+    updatedAt: ISODate('2026-05-06T13:46:19.209Z'),
+    __v: 0
+  },
+  {
+    _id: ObjectId('69fb52f5997b65073e0a78e5'),
+    name: 'Yasir Sultan',
+    email: 'i221510@nu.edu.pk',
+    password: '$2b$10$L/llvkgaZ/sWJc1Q5WJGve5CDjpEHo0Wy4ujueQZT7stgbM0SFy5K',
+    role: 'admin',
+    isApproved: false,
+    status: 'Active',
+    registeredCourses: [],
+    createdAt: ISODate('2026-05-06T14:40:53.340Z'),
+    updatedAt: ISODate('2026-05-06T14:41:24.215Z'),
+    __v: 0
+  }
+]
+WebDb>

@@ -7,18 +7,21 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import StudentDashboard from "./pages/StudentDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
 
 // We create a wrapper component to access useLocation()
 function AppContent() {
   const location = useLocation();
 
   // Define paths where the Top Navbar should NOT appear
-  const hideNavbarPaths = ["/student", "/admin"];
+  const hideNavbarPaths = ["/student", "/admin", "/teacher"];
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Only show Navbar if we are NOT on a dashboard path */}
       {!shouldHideNavbar && <Navbar />}
       
@@ -32,6 +35,10 @@ function AppContent() {
         <Route
           path="/admin"
           element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>}
+        />
+        <Route
+          path="/teacher"
+          element={<ProtectedRoute><TeacherDashboard /></ProtectedRoute>}
         />
       </Routes>
     </>
