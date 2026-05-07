@@ -22,9 +22,9 @@ const decodeHTML = (str) => {
 exports.fetchOpenTDBQuestions = async (req, res) => {
   try {
     const { amount = 10, category = 18, difficulty = "medium" } = req.query;
-    
+
     const response = await axios.get(`https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${difficulty}&type=multiple`);
-    
+
     if (response.data.response_code !== 0) {
       return res.status(400).json({ message: "Failed to fetch questions from OpenTDB" });
     }
@@ -46,30 +46,30 @@ exports.fetchOpenTDBQuestions = async (req, res) => {
 // Get all quizzes created for courses assigned to this teacher
 exports.getTeacherQuizzes = async (req, res) => {
   try {
-    const teacherCourses = await Course.find({ 
+    const user = await User.findById(req.user.id).select("name");
+    const teacherCourses = await Course.find({
       $or: [
         { teacherId: req.user.id },
-        { instructor: req.user.name }
+        { instructor: user.name }     // ← matches existing records
       ]
     }).select("_id");
-    
+
     const courseIds = teacherCourses.map(c => c._id);
     const quizzes = await Quiz.find({ courseId: { $in: courseIds } })
       .populate("courseId", "name");
-    
+
     res.json({ quizzes });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 // Get all quizzes for a student (based on registered courses)
 exports.getAvailableQuizzes = async (req, res) => {
   try {
     const student = await User.findById(req.user.id);
     const quizzes = await Quiz.find({ courseId: { $in: student.registeredCourses } })
       .populate("courseId", "name");
-    
+
     // Check if student already attempted these quizzes
     const attempts = await QuizAttempt.find({ studentId: req.user.id });
     const attemptedQuizIds = attempts.map(a => a.quizId.toString());
